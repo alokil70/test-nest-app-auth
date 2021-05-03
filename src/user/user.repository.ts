@@ -1,9 +1,9 @@
 import { EntityRepository, Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 import { User } from './user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
-import { ConflictException, InternalServerErrorException } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
-import { ALREADY_REGISTERED_ERROR } from '../constants/message.constants';
+import { ConflictException, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
+import { ALREADY_REGISTERED_ERROR, WRONG_PASSWORD } from '../constants/message.constants';
 
 @EntityRepository(User)
 export class UserRepository extends Repository<User> {
@@ -32,6 +32,8 @@ export class UserRepository extends Repository<User> {
 
 		if (user && (await user.validatePassword(password))) {
 			return user.email;
+		} else {
+			throw new UnauthorizedException(WRONG_PASSWORD);
 		}
 	}
 

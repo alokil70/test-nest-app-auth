@@ -1,16 +1,22 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Headers, Param, ParseIntPipe, Patch, Post, ValidationPipe } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './user.entity';
-import { DeleteResult } from 'typeorm';
+import { AuthService } from './auth.service';
 
 @Controller('user')
 export class UserController {
-	constructor(private userService: UserService) {}
+	constructor(private userService: UserService, private authService: AuthService) {}
 
 	@Get()
 	getAll() {
 		return this.userService.getAll();
+	}
+
+	@Get('token')
+	getByToken(@Headers('Authorization') token: string) {
+		console.log('get by controller', token);
+		return this.authService.getUserByToken(token);
 	}
 
 	@Get(':id')
@@ -19,7 +25,7 @@ export class UserController {
 	}
 
 	@Post()
-	create(@Body() createUserDto: CreateUserDto): Promise<void> {
+	create(@Body(ValidationPipe) createUserDto: CreateUserDto): Promise<void> {
 		return this.userService.create(createUserDto);
 	}
 
