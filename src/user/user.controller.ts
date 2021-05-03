@@ -9,8 +9,8 @@ export class UserController {
 	constructor(private userService: UserService) {}
 
 	@Get()
-	getAll(createUserDto: CreateUserDto) {
-		return this.userService.getAll(createUserDto);
+	getAll() {
+		return this.userService.getAll();
 	}
 
 	@Get(':id')

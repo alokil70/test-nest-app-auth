@@ -9,12 +9,12 @@ import { ALREADY_REGISTERED_ERROR } from '../constants/message.constants';
 export class UserRepository extends Repository<User> {
 	async createUser(createUserDto: CreateUserDto): Promise<void> {
 		const { name, email, password, city } = createUserDto;
-		const salt = await bcrypt.genSalt();
 		const user = new User();
 		user.email = email;
 		user.city = city;
 		user.name = name;
-		user.password = await this.hashPassword(password, salt);
+		user.salt = await bcrypt.genSalt();
+		user.password = await this.hashPassword(password, user.salt);
 		try {
 			await user.save();
 		} catch (e) {
@@ -23,6 +23,15 @@ export class UserRepository extends Repository<User> {
 			} else {
 				throw new InternalServerErrorException();
 			}
+		}
+	}
+
+	async validateUserPassword(createUserDto: CreateUserDto): Promise<string> {
+		const { email, password } = createUserDto;
+		const user = await this.findOne({ email });
+
+		if (user && (await user.validatePassword(password))) {
+			return user.email;
 		}
 	}
 

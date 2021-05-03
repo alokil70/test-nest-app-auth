@@ -1,17 +1,16 @@
-import { HttpCode, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { UserRepository } from './user.repository';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './user.entity';
 import { NOT_FOUND } from '../constants/message.constants';
-import { DeleteResult } from 'typeorm';
 
 @Injectable()
 export class UserService {
 	constructor(@InjectRepository(UserRepository) private userRepository: UserRepository) {}
 
-	async getAll(createUserDto: CreateUserDto): Promise<User[]> {
-		const found = await this.userRepository.find(createUserDto);
+	async getAll(): Promise<User[]> {
+		const found = await this.userRepository.find();
 		if (!found.length) {
 			throw new NotFoundException(NOT_FOUND);
 		}
