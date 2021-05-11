@@ -1,4 +1,12 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
+import {
+	BaseEntity,
+	Column,
+	CreateDateColumn,
+	Entity,
+	PrimaryGeneratedColumn,
+	Unique,
+	UpdateDateColumn,
+} from 'typeorm';
 import * as bcrypt from 'bcrypt';
 
 @Entity()
@@ -21,6 +29,12 @@ export class User extends BaseEntity {
 
 	@Column()
 	city: string;
+
+	@CreateDateColumn({ type: 'timestamp with time zone' })
+	createdAt: Date;
+
+	@UpdateDateColumn({ type: 'timestamp with time zone' })
+	updatedAt: Date;
 
 	async validatePassword(password: string): Promise<boolean> {
 		const hash = await bcrypt.hash(password, this.salt);

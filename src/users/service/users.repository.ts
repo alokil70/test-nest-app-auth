@@ -1,9 +1,9 @@
 import { EntityRepository, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { User } from './user.entity';
-import { CreateUserDto } from './dto/create-user.dto';
+import { User } from '../user.entity';
+import { CreateUserDto } from '../dto/create-user.dto';
 import { ConflictException, InternalServerErrorException, UnauthorizedException } from '@nestjs/common';
-import { ALREADY_REGISTERED_ERROR, WRONG_PASSWORD } from '../constants/message.constants';
+import { ALREADY_REGISTERED_ERROR, WRONG_PASSWORD } from '../../constants/message.constants';
 
 @EntityRepository(User)
 export class UsersRepository extends Repository<User> {
@@ -26,12 +26,11 @@ export class UsersRepository extends Repository<User> {
 		}
 	}
 
-	async validateUserPassword(createUserDto: CreateUserDto): Promise<string> {
-		const { email, password } = createUserDto;
+	async validateUserPassword(email: string, pass: string): Promise<User> {
 		const user = await this.findOne({ email });
 
-		if (user && (await user.validatePassword(password))) {
-			return user.email;
+		if (user && (await user.validatePassword(pass))) {
+			return user;
 		} else {
 			throw new UnauthorizedException(WRONG_PASSWORD);
 		}

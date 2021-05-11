@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UsersRepository } from './users.repository';
-import { CreateUserDto } from './dto/create-user.dto';
-import { NOT_FOUND } from '../constants/message.constants';
-import { User } from './user.entity';
+import { CreateUserDto } from '../dto/create-user.dto';
+import { NOT_FOUND } from '../../constants/message.constants';
+import { User } from '../user.entity';
 
 export type Users = any;
 
@@ -21,6 +21,14 @@ export class UsersService {
 
 	async getById(id: number): Promise<User> {
 		const found = await this.usersRepository.findOne(id);
+		if (!found) {
+			throw new NotFoundException(NOT_FOUND);
+		}
+		return found;
+	}
+
+	async findByEmail(email: string, pass: string): Promise<User> {
+		const found = await this.usersRepository.validateUserPassword(email, pass);
 		if (!found) {
 			throw new NotFoundException(NOT_FOUND);
 		}
@@ -48,6 +56,7 @@ export class UsersService {
 		await found.save();
 		return found;
 	}
+
 	private readonly users = [
 		{
 			userId: 1,
